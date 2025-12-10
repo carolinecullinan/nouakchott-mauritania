@@ -1,0 +1,35 @@
+# large data files
+*.tif
+*.tiff
+data/raw/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# jupyter notebook checkpoints
+.ipynb_checkpoints
+
+# environment variables
+.env
+# .venv
+# env/
+# venv/
+# ENV/
+/.quarto/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# quarto output directory
+_site/
+.quarto/

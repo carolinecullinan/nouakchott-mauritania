@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: _site
+  resources:
+    - data/processed/
+    - functions.ojs
+
+website:
+  title: "Noukchott, Mauritania"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: true
+
+execute:
+  freeze: auto
