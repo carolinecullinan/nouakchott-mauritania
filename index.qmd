@@ -7045,12 +7045,12 @@ function plot_deforestation_area6(deforestation_area, {
     return svg.node();
   }
      
-// function that plots flood events to create (scatter) flood event chart (i.e., Large flood events in xxxx)
+// function with d3.js that plots flood events to create (scatter) flood event chart (i.e., Large flood events in xxxx)
 function plot_fe(fe, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Year",
+  xLabel = "Month",
   color = "black"
 } = {}) {
   
@@ -7065,11 +7065,10 @@ function plot_fe(fe, {
   const innerHeight = height - margin.top - margin.bottom;
   
   // get unique months for x-axis
-  const months = Array.from(new Set(fe.map(d => d.begin_month))).sort((a, b) => a - b);
-  const monthNames = fe.reduce((acc, d) => {
-    if (!acc[d.begin_month]) acc[d.begin_month] = d.monthName;
-    return acc;
-  }, {});
+  const monthNames = {
+       1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr", 5: "May", 6: "Jun",
+       7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"
+     };
   
   // scales
   const xScale = d3.scaleLinear()
@@ -7147,7 +7146,7 @@ function plot_fe(fe, {
     .attr("font-size", "10px")
     .attr("font-family", "system-ui")
     .attr("font-weight", "normal")
-    .attr("dy", "0.5em");
+    .attr("dy", "1.5em");
   
   // dots (bubbles) with tooltips
   g.selectAll(".dot")
@@ -7225,7 +7224,7 @@ function plot_fe(fe, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
   
   // legend
   const legendX = width - 180;
@@ -7268,6 +7267,17 @@ function plot_fe(fe, {
     .attr("font-family", "system-ui")
     .attr("font-weight", "normal")
     .text(yLabel);
+
+  // x-axis label
+  svg.append("text")
+    .attr("x", margin.left + innerWidth/2)
+    .attr("y", height - 45)
+    .attr("text-anchor", "middle")
+    .attr("fill", "currentColor")
+    .attr("font-size", "11px")
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .text(xLabel);
     
   return svg.node();
 }
