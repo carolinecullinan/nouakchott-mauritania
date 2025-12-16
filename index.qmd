@@ -14,21 +14,33 @@ d3 = require("d3")
 #### Data
 ```{ojs}
 //| include: false
-// load data as CSVs directly
-// pg = FileAttachment("data/processed/pg.csv").csv({typed: true})
+// load data as CSVs directly (NOUAKCHOTT DATA)
+pg = FileAttachment("data/processed/pg.csv").csv({typed: true})
 pas = FileAttachment("data/processed/pas.csv").csv({typed: true})
-// rwi_area = FileAttachment("data/processed/rwi_area.csv").csv({typed: true})
-// uba = FileAttachment("data/processed/uba.csv").csv({typed: true})
-// uba_area = FileAttachment("data/processed/uba_area.csv").csv({typed: true})
+rwi_area = FileAttachment("data/processed/rwi_area.csv").csv({typed: true})
+uba = FileAttachment("data/processed/uba.csv").csv({typed: true})
+uba_area = FileAttachment("data/processed/uba_area.csv").csv({typed: true})
 lc = FileAttachment("data/processed/lc.csv").csv({typed: true})
-// pug = FileAttachment("data/processed/pug.csv").csv({typed: true})
-// pv = FileAttachment("data/processed/pv.csv").csv({typed: true})
-// pv_area = FileAttachment("data/processed/pv_area.csv").csv({typed: true})
+pug = FileAttachment("data/processed/pug.csv").csv({typed: true})
+pv = FileAttachment("data/processed/pv.csv").csv({typed: true})
+pv_area = FileAttachment("data/processed/pv_area.csv").csv({typed: true})
 aq_area = FileAttachment("data/processed/aq_area.csv").csv({typed: true})
-// summer_area = FileAttachment("data/processed/summer_area.csv").csv({typed: true})
-// ndvi_area = FileAttachment("data/processed/ndvi_area.csv").csv({typed: true})
+summer_area = FileAttachment("data/processed/summer_area.csv").csv({typed: true})
+ndvi_area = FileAttachment("data/processed/ndvi_area.csv").csv({typed: true})
 deforestation_area = FileAttachment("data/processed/deforestation_area.csv").csv({typed: true})
-// fe = FileAttachment("data/processed/flood-events.csv").csv({typed: true})
+//fe = FileAttachment("data/processed/flood-events.csv").csv({typed: true})
+// hard code fe events since Nouakchott output did not include the standard flood-events.csv file, and instead, only included the scan-calculations.html sheet pdf output for this plot
+fe = [
+  {
+    begin_year: 1995,
+    begin_month: 9,
+    DISPLACED: 95000,
+    severity: "Large event",
+    line1: "SEPTEMBER 1995: Large event, Heavy rain",
+    line2: "7 days, 0 fatalities, 95,000 displaced",
+    line3: ""
+  }
+];
 fu = FileAttachment("data/processed/fu.csv").csv({typed: true})
 pu = FileAttachment("data/processed/pu.csv").csv({typed: true})
 cu = FileAttachment("data/processed/cu.csv").csv({typed: true})
@@ -56,7 +68,6 @@ barOffset = Math.max(2, plotWidth / 160)
 // function with d3.js that plots pga (i.e., absolute population growth) (population growth, xxxx - xxxx) to create pga chart
 function plot_pga(pg, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Population",
   xLabel = "Year",
@@ -232,7 +243,7 @@ function plot_pga(pg, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -263,7 +274,6 @@ function plot_pga(pg, {
 // function with d3.js that plots pgp (population growth percentage, xxxx - xxxx) to create pgp chart
 function plot_pgp(pg, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Population Growth Percentage",
   xLabel = "Year",
@@ -435,7 +445,7 @@ function plot_pgp(pg, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -466,7 +476,6 @@ function plot_pgp(pg, {
 // function with d3.js that plots pas (population age, sex) to create pas chart (i.e., Population Distribution by Age & Sex, xxxx)
 function plot_pas(pas, {
     cityName = "City",
-    countryName = "",
     width = plotWidth,
     yLabel = "Percentage of Age Distribution",
     xLabel = "Age Bracket",
@@ -704,7 +713,7 @@ function plot_pas(pas, {
       .attr("font-family", "system-ui")
       .attr("font-style", "italic")
       .attr("font-weight", "normal")
-      .text(`${cityName}, ${countryName}`);
+      .text(cityName);
     
     // y-axis label - to match Observable Plot defaulty styling
     svg.append("text")
@@ -735,7 +744,6 @@ function plot_pas(pas, {
 // function with d3.js that plots pas (population age, sex) to create pas pyramid chart (i.e., Population Distribution by Age & Sex, xxxx)
 function plot_pas_pyramid(pas, {
     cityName = "City",
-    countryName = "",
     width = plotWidth,
     yLabel = "Age Bracket",
     xLabel = "Percentage of Age Distribution",
@@ -1029,7 +1037,7 @@ function plot_pas_pyramid(pas, {
       .attr("font-family", "system-ui")
       .attr("font-style", "italic")
       .attr("font-weight", "normal")
-      .text(`${cityName}, ${countryName}`);
+      .text(cityName);
   
     // y-axis label - to match Observable Plot default styling
     svg.append("text")
@@ -1642,8 +1650,6 @@ function plot_dependency(pas, {
     return svg.node();
   }
 
-// ECONOMIC ACTIVITY //
-
 // helper function for plot_rwi_area that sorts rwi wealth categories in the correct order
 function parseRwiCategory(bin) {
     const categoryOrder = {
@@ -1656,6 +1662,8 @@ function parseRwiCategory(bin) {
     
     return categoryOrder[bin] || 0;
   }
+
+// ECONOMIC ACTIVITY //
 
 // function with d3.js that plots rwi_area by percentage distribution to create realtive wealth index (rwi) chart (i.e., "Least wealthy"; "Less wealthy"; "Average wealth"; "More wealthy"; and "Most wealthy" areas as a percentage of total area) using styling for visual cohesion with rwi map)
 function plot_rwi_area(rwi_area, {
@@ -1839,12 +1847,13 @@ function plot_rwi_area(rwi_area, {
     xAxisGroup.select(".domain")
       .attr("stroke", "currentColor")
       .attr("stroke-width", 1);
-    xAxisGroup.selectAll(".tick text")
+   
+   xAxisGroup.selectAll(".tick text")
       .attr("fill", "currentColor")
       .attr("font-size", "10px")
       .attr("font-family", "system-ui")
-      .attr("font-weight", "normal");
-      
+      .attr("font-weight", "normal")
+      .attr("dy", "1.5em");
     if (width < 500) {
       xAxisGroup.selectAll("text")
         .style("text-anchor", "end")
@@ -2150,6 +2159,7 @@ function plot_uba_area(uba_area, {
       .attr("fill", "currentColor")
       .attr("font-size", "10px")
       .attr("font-family", "system-ui")
+      .attr("dy", "1.5em") // label positioning slightly down
       .attr("font-weight", "normal");
       
     if (width < 500) {
@@ -2224,7 +2234,6 @@ function plot_uba_area(uba_area, {
 // function with d3.js that plots ubaa (i.e., absolute urban extent and change) to create ubaa chart (i.e., Urban Extent and Change chart, xxxx - xxxx)
 function plot_ubaa(uba, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Urban Built-up Area (sq km)",
   xLabel = "Year",
@@ -2400,7 +2409,7 @@ function plot_ubaa(uba, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -2431,7 +2440,6 @@ function plot_ubaa(uba, {
 // function with d3.js that plots ubap (urban extent and change growth percentage, xxxx - xxxx) to create ubap chart
 function plot_ubap(uba, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Urban Built-up area Growth Percentage",
   xLabel = "Year",
@@ -2602,7 +2610,7 @@ function plot_ubap(uba, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -2635,7 +2643,6 @@ plot_lc = function(lc, {
     width = plotWidth,
     height = plotWidth * 0.6, // maintains a 1.67:1 aspect ratio (width: height), note: 0.5 = wider chart (2:1 ratio); 0.75 = more square (1.33:1 ratio) 
     cityName = "City",
-    countryName = "",
   } = {}) {
     
     // filter and prepare data
@@ -2835,7 +2842,7 @@ plot_lc = function(lc, {
       .attr("font-family", "system-ui")
       .attr("font-style", "italic")
       .attr("font-weight", "normal")
-      .text(`${cityName}, ${countryName}`);
+      .text(`${cityName}`);
     
     container.node().appendChild(svg.node());
     return container.node();
@@ -2851,7 +2858,6 @@ plot_lc = function(lc, {
 // , i.e. all 6 charts as small multiples in a 3x2 grid
 function plot_uddm(pg, uba, pug, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   color = "black"
 } = {}) {
@@ -3761,7 +3767,7 @@ function plot_uddm(pg, uba, pug, {
   ">
     <div style="grid-column: 1 / -1; text-align: left; margin-bottom: 0px;">
       <h2 style="margin: 0; font-size: ${Math.max(16, Math.min(20, width / 50))}px; font-weight: 500; color: #222;">Urban Development Dynamics</h2>
-      <h3 style="margin: 5px 0 0 0; font-size: ${Math.max(14, Math.min(18, width / 55))}px; font-style: italic; font-weight: 400; color: #555;">${cityName}, ${countryName}</h3>
+      <h3 style="margin: 5px 0 0 0; font-size: ${Math.max(14, Math.min(18, width / 55))}px; font-style: italic; font-weight: 400; color: #555;">${cityName}</h3>
     </div>
     <div>${chart1}</div>
     <div>${chart2}</div>
@@ -4002,11 +4008,13 @@ function plot_pv_area(pv_area, {
     xAxisGroup.select(".domain")
       .attr("stroke", "currentColor")
       .attr("stroke-width", 1);
+    
     xAxisGroup.selectAll(".tick text")
       .attr("fill", "currentColor")
       .attr("font-size", "10px")
       .attr("font-family", "system-ui")
-      .attr("font-weight", "normal");
+      .attr("font-weight", "normal")
+      .attr("dy", "1.5em");
       
     if (width < 500) {
       xAxisGroup.selectAll("text")
@@ -4096,7 +4104,6 @@ function plot_pv_area(pv_area, {
 // function with d3.js that plots pv to create alternative pv chart (i.e., Seasonal availability of solar energy, January - December with color bands indicating if conditions are "Excellent", "Favorable", or "Less than Favorable")
 function plot_pv_alt(pv, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   xLabel = "Month",
   yLabel = "Daily PV Energy Yield (kWh/kWp)",
@@ -4202,10 +4209,13 @@ function plot_pv_alt(pv, {
     .tickFormat(d => pv[d-1]?.monthName || "")
     .tickSizeOuter(0));
   xAxisGroup.select(".domain").attr("stroke", "currentColor");
+ 
   xAxisGroup.selectAll(".tick text")
-    .attr("font-size", "11px")
+    .attr("fill", "currentColor")
+    .attr("font-size", "10px")
     .attr("font-family", "system-ui")
-    .attr("dy", "0.5em");
+    .attr("font-weight", "normal")
+    .attr("dy", "1.5em");
   
   // line
   const line = d3.line()
@@ -4297,7 +4307,7 @@ function plot_pv_alt(pv, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
   
   // caption
   svg.append("text")
@@ -4338,7 +4348,6 @@ function plot_pv_alt(pv, {
 // function with d3.js that plots pv condition level distribution to create pv_d chart (i.e., photovoltaic potential condition level distribution [horizontal bar chart])
 function plot_pv_d(pv, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Condition",
   xLabel = "Month",
@@ -4537,7 +4546,7 @@ function plot_pv_d(pv, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName} (${pv.length}-month period)`);
+    .text(`${cityName} (${pv.length}-month period)`);
   
   // caption
   svg.append("text")
@@ -4574,6 +4583,18 @@ function plot_pv_d(pv, {
   
   return svg.node();
 }
+
+// helper function for plot_aq function (i.e., functions that plots the air quality chart) that sorts the air quality bins numerically so that the data gets plotted from smallest to highest 2019 levels of PM2.5 µg/mˆ3
+function parseAirQualityRange(bin) {
+    const binStr = String(bin);
+    
+    if (binStr.includes('-')) {
+      const [start] = binStr.split('-').map(x => parseFloat(x));
+      return start;
+    }
+    
+    return parseFloat(binStr);
+  }
 
 // function with d3.js that plots pv to create pv chart (i.e., Seasonal Availability of Solar Energy, January - December)
 function plot_pv(pv, {
@@ -4780,7 +4801,7 @@ function plot_pv(pv, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -4807,18 +4828,6 @@ function plot_pv(pv, {
     
   return svg.node();
 }
-
-// helper function for plot_aq function (i.e., functions that plots the air quality chart) that sorts the air quality bins numerically so that the data gets plotted from smallest to highest 2019 levels of PM2.5 µg/mˆ3
-function parseAirQualityRange(bin) {
-    const binStr = String(bin);
-    
-    if (binStr.includes('-')) {
-      const [start] = binStr.split('-').map(x => parseFloat(x));
-      return start;
-    }
-    
-    return parseFloat(binStr);
-  }
 
 // function with d3.js that plots, aq, percentage distribution to create aq chart (i.e., air quality chart) using styling for visual cohesion with air quality map)
 function plot_aq(aq_area, {
@@ -4876,7 +4885,7 @@ function plot_aq(aq_area, {
       .domain([0, 100])
       .range([innerHeight, 0]);
   
-    // svg
+    // SVG
     const svg = d3.create("svg")
       .attr("width", width)
       .attr("height", height)
@@ -5034,10 +5043,12 @@ function plot_aq(aq_area, {
     xAxisGroup.select(".domain")
       .attr("stroke", "currentColor")
       .attr("stroke-width", 1);
+ 
     xAxisGroup.selectAll(".tick text")
       .attr("fill", "currentColor")
       .attr("font-size", "10px")
       .attr("font-family", "system-ui")
+      .attr("dy", "1.5em") // label positioning slightly down
       .attr("font-weight", "normal");
       
     if (width < 500) {
@@ -5353,11 +5364,13 @@ function plot_summer_area(summer_area, {
     xAxisGroup.select(".domain")
       .attr("stroke", "currentColor")
       .attr("stroke-width", 1);
-    xAxisGroup.selectAll(".tick text")
-      .attr("fill", "currentColor")
-      .attr("font-size", "10px")
-      .attr("font-family", "system-ui")
-      .attr("font-weight", "normal");
+
+  xAxisGroup.selectAll(".tick text")
+    .attr("fill", "currentColor")
+    .attr("font-size", "10px")
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .attr("dy", "1.5em");
       
     if (width < 500) {
       xAxisGroup.selectAll("text")
@@ -5662,11 +5675,13 @@ function plot_ndvi_area(ndvi_area, {
     xAxisGroup.select(".domain")
       .attr("stroke", "currentColor")
       .attr("stroke-width", 1);
+
     xAxisGroup.selectAll(".tick text")
       .attr("fill", "currentColor")
       .attr("font-size", "10px")
       .attr("font-family", "system-ui")
-      .attr("font-weight", "normal");
+      .attr("font-weight", "normal")
+      .attr("dy", "1.5em");
       
     if (width < 500) {
       xAxisGroup.selectAll("text")
@@ -5753,14 +5768,24 @@ function plot_ndvi_area(ndvi_area, {
     return svg.node();
   }
 
-// function with d3.js that plots cumulative forest loss over time to create deforestation_area1 chart
+// function with d3.js that plots forest remaining in HECTARES over time to create deforestation_area2 chart
+
+// note: pixel size calculation:
+// Hansen Global Forest Change dataset in GEE has a native pixel resolution of 30.92 meters, even though it is commonly cited as 30 meters https://developers.google.com/earth-engine/datasets/catalog/UMD_hansen_global_forest_change_2024_v1_12
+
+// pixel area calculation:
+// 30.92m * 30.92m = 956.05 m²; 956.05 m² / 10,000 = 0.095605 hectares per pixel
+
+// backend exports use scale: 30.92 (see gee_fun.py line 323, 335), so this conversion factor is correct: https://github.com/rosemaryturtle/city-scan-automation/blob/main/backend/gee_fun.py 
+
 function plot_deforestation_area1(deforestation_area, {
   cityName = "City",
   countryName = "",
   width = plotWidth,
   xLabel = "Year",
-  yLabel = "Percentage of Forest Loss (%)",
-  color = "black"
+  yLabel = "Forest Area Remaining (hectares)",
+  color = "black",
+  pixelSizeHectares = 0.095605  // backend export: 30.92m x 30.92m pixel = 0.095605 ha https://github.com/rosemaryturtle/city-scan-automation/blob/main/backend/gee_fun.py 
 } = {}) {
   
   const height = width * 0.6;
@@ -5773,17 +5798,239 @@ function plot_deforestation_area1(deforestation_area, {
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
   
+  // convert pixels to hectares and add to data
+  const dataWithHectares = deforestation_area.map(d => ({
+    ...d,
+    forest_remaining_ha: d.forest_remaining * pixelSizeHectares
+  }));
+  
   // year range
-  const minYear = d3.min(deforestation_area, d => d.year);
-  const maxYear = d3.max(deforestation_area, d => d.year);
+  const minYear = d3.min(dataWithHectares, d => d.year);
+  const maxYear = d3.max(dataWithHectares, d => d.year);
   
   // scales
   const xScale = d3.scaleLinear()
-    .domain(d3.extent(deforestation_area, d => d.year))
+    .domain(d3.extent(dataWithHectares, d => d.year))
     .range([0, innerWidth]);
     
   const yScale = d3.scaleLinear()
-    .domain([0, Math.max(...deforestation_area.map(d => d.percent_forest_lost)) * 1.1])
+    .domain([
+      d3.min(dataWithHectares, d => d.forest_remaining_ha) * 0.995,  // slight padding
+      d3.max(dataWithHectares, d => d.forest_remaining_ha) * 1.002
+    ])
+    .range([innerHeight, 0]);
+
+  // svg
+  const svg = d3.create("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .style("background", "white")
+    .style("font", "10px system-ui");
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+  
+  // y-axis with grid lines
+  const yTicks = Math.max(4, Math.min(10, Math.floor(width * 0.6) / 60));
+  const yAxisGroup = g.append("g").attr("class", "y-axis");
+  const yAxisCall = d3.axisLeft(yScale)
+    .ticks(yTicks)
+    .tickSizeOuter(0)
+    .tickSizeInner(-innerWidth)
+    .tickFormat(d3.format("~s"));
+
+  yAxisGroup.call(yAxisCall);
+  yAxisGroup.select(".domain").remove();
+  yAxisGroup.selectAll(".tick line")
+    .attr("stroke", "#f0f0f0")
+    .attr("stroke-width", 1);
+  yAxisGroup.selectAll(".tick text")
+    .attr("fill", "currentColor")
+    .attr("font-size", "10px")
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .attr("dx", "-0.3em");
+  
+  // x-axis
+  const xAxisGroup = g.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", `translate(0,${innerHeight})`);
+    
+  xAxisGroup.call(d3.axisBottom(xScale)
+    .ticks(Math.max(5, Math.min(15, Math.floor(width / 80))))
+    .tickFormat(d3.format("d"))
+    .tickSizeOuter(0));
+  xAxisGroup.select(".domain")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 1);
+
+  xAxisGroup.selectAll(".tick text")
+    .attr("fill", "currentColor")
+    .attr("font-size", "10px")
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .attr("dy", "1.5em");
+  
+  // line (with defined function to skip null values)
+  const line = d3.line()
+    .defined(d => d.forest_remaining_ha !== null && !isNaN(d.forest_remaining_ha))
+    .x(d => xScale(d.year))
+    .y(d => yScale(d.forest_remaining_ha));
+    
+  g.append("path")
+    .datum(dataWithHectares)
+    .attr("fill", "none")
+    .attr("stroke", color)
+    .attr("stroke-width", Math.max(1.5, Math.min(3, width / 400)))
+    .attr("d", line);
+  
+  // dots (filter out null values)
+  g.selectAll(".dot")
+    .data(dataWithHectares.filter(d => d.forest_remaining_ha !== null && !isNaN(d.forest_remaining_ha)))
+    .enter().append("circle")
+    .attr("class", "dot")
+    .attr("cx", d => xScale(d.year))
+    .attr("cy", d => yScale(d.forest_remaining_ha))
+    .attr("r", Math.max(2, Math.min(3, width / 200)))
+    .attr("fill", color)
+    .style("cursor", "default")
+    .on("mouseover", function(event, d) {
+      d3.selectAll(".d3-tooltip").remove();
+
+      const tooltip = d3.select("body").append("div")
+        .attr("class", "d3-tooltip")
+        .style("position", "absolute")
+        .style("background", "white")
+        .style("color", "black")
+        .style("padding", "8px 12px")
+        .style("border", "1.8px solid #000000")
+        .style("font-family", "system-ui")
+        .style("font-size", "12px")
+        .style("font-weight", "normal")
+        .style("line-height", "1.4")
+        .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)")
+        .style("pointer-events", "none")
+        .style("z-index", "1000")
+        .style("opacity", 0);
+        
+      tooltip.html(`<div>Year: ${d.year}</div><div>${yLabel}: ${d.forest_remaining_ha.toLocaleString('en-US', {maximumFractionDigits: 0})} ha</div>`)
+        .style("left", (event.pageX - 60) + "px")
+        .style("top", (event.pageY - 60) + "px")
+        .transition()
+        .duration(200)
+        .style("opacity", 1);
+    })
+    .on("mousemove", function(event) {
+      const tooltip = d3.select(".d3-tooltip");
+      if (!tooltip.empty()) {
+        tooltip
+          .style("left", (event.pageX - 60) + "px")
+          .style("top", (event.pageY - 60) + "px");
+      }
+    })
+    .on("mouseout", function() {
+      d3.selectAll(".d3-tooltip")
+        .transition()
+        .duration(200)
+        .style("opacity", 0)
+        .remove();
+    });
+  
+  // title
+  svg.append("text")
+    .attr("x", 20)
+    .attr("y", 25)
+    .attr("text-anchor", "start")
+    .attr("fill", "currentColor")
+    .attr("font-size", "18px") 
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .text(`Forest Remaining Over Time, ${minYear}-${maxYear}`);
+    
+  // subtitle
+  svg.append("text")
+    .attr("x", 20)
+    .attr("y", 45)
+    .attr("text-anchor", "start")
+    .attr("fill", "currentColor")
+    .attr("font-size", "16px")
+    .attr("font-family", "system-ui")
+    .attr("font-style", "italic")
+    .attr("font-weight", "normal")
+    .text(`${cityName}, ${countryName}`);
+    
+  // y-axis label
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 20)
+    .attr("x", -(margin.top + innerHeight/2))
+    .attr("text-anchor", "middle")
+    .attr("fill", "currentColor")
+    .attr("font-size", "11px")
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .text(yLabel);
+    
+  // x-axis label
+  svg.append("text")
+    .attr("x", margin.left + innerWidth/2)
+    .attr("y", height - 45)
+    .attr("text-anchor", "middle")
+    .attr("fill", "currentColor")
+    .attr("font-size", "11px")
+    .attr("font-family", "system-ui")
+    .attr("font-weight", "normal")
+    .text(xLabel);
+    
+  return svg.node();
+}
+
+// function with d3.js that plots forest remaining in HECTARES over time to create deforestation_area2 chart
+
+// note: pixel size calculation:
+// Hansen Global Forest Change dataset in GEE has a native pixel resolution of 30.92 meters, even though it is commonly cited as 30 meters https://developers.google.com/earth-engine/datasets/catalog/UMD_hansen_global_forest_change_2024_v1_12
+
+// pixel area calculation:
+// 30.92m * 30.92m = 956.05 m²; 956.05 m² / 10,000 = 0.095605 hectares per pixel
+
+// backend exports use scale: 30.92 (see gee_fun.py line 323, 335), so this conversion factor is correct: https://github.com/rosemaryturtle/city-scan-automation/blob/main/backend/gee_fun.py 
+function plot_deforestation_area2(deforestation_area, {
+  cityName = "City",
+  countryName = "",
+  width = plotWidth,
+  xLabel = "Year",
+  yLabel = "Cumulative Forest Loss (hectares)",
+  color = "black",
+  pixelSizeHectares = 0.095605  // backend export: 30.92m x 30.92m pixel = 0.095605 ha, https://github.com/rosemaryturtle/city-scan-automation/blob/main/backend/gee_fun.py
+} = {}) {
+  
+  const height = width * 0.6;
+  const margin = {
+    top: 70,
+    right: Math.max(20, width * 0.02), 
+    bottom: Math.max(90, width * 0.1),
+    left: Math.max(80, width * 0.08)
+  };
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
+  
+  // convert pixels to hectares and add to data
+  const dataWithHectares = deforestation_area.map(d => ({
+    ...d,
+    cumulative_deforested_ha: d.cumulative_deforested * pixelSizeHectares
+  }));
+  
+  // year range
+  const minYear = d3.min(dataWithHectares, d => d.year);
+  const maxYear = d3.max(dataWithHectares, d => d.year);
+  
+  // scales
+  const xScale = d3.scaleLinear()
+    .domain(d3.extent(dataWithHectares, d => d.year))
+    .range([0, innerWidth]);
+    
+  const yScale = d3.scaleLinear()
+    .domain([0, d3.max(dataWithHectares, d => d.cumulative_deforested_ha) * 1.1])
     .range([innerHeight, 0]);
 
   // svg
@@ -5844,12 +6091,12 @@ function plot_deforestation_area1(deforestation_area, {
   
   // line (with defined function to skip null values)
   const line = d3.line()
-    .defined(d => d.percent_forest_lost !== null)
+    .defined(d => d.cumulative_deforested_ha !== null && !isNaN(d.cumulative_deforested_ha))
     .x(d => xScale(d.year))
-    .y(d => yScale(d.percent_forest_lost));
+    .y(d => yScale(d.cumulative_deforested_ha));
     
   g.append("path")
-    .datum(deforestation_area)
+    .datum(dataWithHectares)
     .attr("fill", "none")
     .attr("stroke", color)
     .attr("stroke-width", Math.max(1.5, Math.min(3, width / 400)))
@@ -5857,11 +6104,11 @@ function plot_deforestation_area1(deforestation_area, {
   
   // dots (filter out null values)
   g.selectAll(".dot")
-    .data(deforestation_area.filter(d => d.percent_forest_lost !== null))
+    .data(dataWithHectares.filter(d => d.cumulative_deforested_ha !== null && !isNaN(d.cumulative_deforested_ha)))
     .enter().append("circle")
     .attr("class", "dot")
     .attr("cx", d => xScale(d.year))
-    .attr("cy", d => yScale(d.percent_forest_lost))
+    .attr("cy", d => yScale(d.cumulative_deforested_ha))
     .attr("r", Math.max(2, Math.min(3, width / 200)))
     .attr("fill", color)
     .style("cursor", "default")
@@ -5884,7 +6131,7 @@ function plot_deforestation_area1(deforestation_area, {
         .style("z-index", "1000")
         .style("opacity", 0);
         
-      tooltip.html(`<div>Year: ${d.year}</div><div>${yLabel}: ${d.percent_forest_lost.toFixed(2)}%</div>`)
+      tooltip.html(`<div>Year: ${d.year}</div><div>${yLabel}: ${d.cumulative_deforested_ha.toLocaleString('en-US', {maximumFractionDigits: 0})} ha</div>`)
         .style("left", (event.pageX - 60) + "px")
         .style("top", (event.pageY - 60) + "px")
         .transition()
@@ -5916,7 +6163,7 @@ function plot_deforestation_area1(deforestation_area, {
     .attr("font-size", "18px") 
     .attr("font-family", "system-ui")
     .attr("font-weight", "normal")
-    .text(`Cumulative Forest Loss Over Time, ${minYear}-${maxYear}`);
+    .text(`Forest Loss Over Time, ${minYear}-${maxYear}`);
     
   // subtitle
   svg.append("text")
@@ -5956,38 +6203,39 @@ function plot_deforestation_area1(deforestation_area, {
   return svg.node();
 }
 
-// function with d3.js that plots deforestation_area data for the "annual deforestation as percentage of original forest" using styling for visual cohesion with deforestation map (i.e., City Scan, Climate Conditions, Forests & Deforestation, 2000-2020* (actually 2025, since data goes to 2023) map)
+// function with d3.js that plots deforestation_area data for annual deforestation in HECTARES
+
+// note: pixel size calculation:
+// Hansen Global Forest Change dataset in GEE has a native pixel resolution of 30.92 meters, even though it is commonly cited as 30 meters https://developers.google.com/earth-engine/datasets/catalog/UMD_hansen_global_forest_change_2024_v1_12
+
+// pixel area calculation:
+// 30.92m * 30.92m = 956.05 m²; 956.05 m² / 10,000 = 0.095605 hectares per pixel
+
+// backend exports use scale: 30.92 (see gee_fun.py line 323, 335), so this conversion factor is correct: https://github.com/rosemaryturtle/city-scan-automation/blob/main/backend/gee_fun.py 
 function plot_deforestation_area3(deforestation_area, {
     cityName = "City", 
     countryName = "",
     width = plotWidth,
     xLabel = "Year",
-    yLabel = "Percent of Original Forest (%)",
+    yLabel = "Annual Forest Loss (hectares)",
+    pixelSizeHectares = 0.095605  // backend export: 30.92m x 30.92m pixel = 0.095605 ha https://github.com/rosemaryturtle/city-scan-automation/blob/main/backend/gee_fun.py 
   } = {}) {
     
     // sort data by year
     const sortedData = deforestation_area.slice().sort((a, b) => a.year - b.year);
+    
+    // convert pixels to hectares for annual deforestation
+    const dataWithHectares = sortedData.map(d => ({
+      ...d,
+      deforested_this_year_ha: d.deforested_this_year * pixelSizeHectares
+    }));
   
     // year range from data
-    const minYear = d3.min(sortedData, d => d.year);
-    const maxYear = d3.max(sortedData, d => d.year);
+    const minYear = d3.min(dataWithHectares, d => d.year);
+    const maxYear = d3.max(dataWithHectares, d => d.year);
     
-    // color scale (for visual cohesion with deforestation map),  where: light yellow (early); orange (mid); dark red (recent)
-      const colorScale = d3.scaleLinear()
-      .domain([
-        minYear, 
-        minYear + (maxYear - minYear) * 0.33,
-        minYear + (maxYear - minYear) * 0.67,
-        maxYear
-      ])
-      .range(["#f3f14d", "#f2cc69", "#eead70", "#e47673"])
-      .interpolate(d3.interpolateRgb);
-    
-    // create color map for all years in data
-    const deforestationColorMap = {};
-    sortedData.forEach(d => {
-      deforestationColorMap[d.year] = colorScale(d.year);
-    });
+    // single color for all bars
+    const barColor = "#e47673";
     
     const height = width * 0.6;
     const margin = {
@@ -6000,12 +6248,12 @@ function plot_deforestation_area3(deforestation_area, {
     const innerHeight = height - margin.top - margin.bottom;
     
     const xScale = d3.scaleBand()
-      .domain(sortedData.map(d => d.year))
+      .domain(dataWithHectares.map(d => d.year))
       .range([0, innerWidth])
       .padding(0.15);
       
     // dynamic y-scale based on data
-    const maxValue = d3.max(sortedData, d => d.percent_forest_lost);
+    const maxValue = d3.max(dataWithHectares, d => d.deforested_this_year_ha);
     const yScale = d3.scaleLinear()
       .domain([0, maxValue * 1.1])
       .range([innerHeight, 0]);
@@ -6027,7 +6275,7 @@ function plot_deforestation_area3(deforestation_area, {
       .ticks(yTicks)
       .tickSizeOuter(0)
       .tickSizeInner(-innerWidth)
-      .tickFormat(d => d.toFixed(2));
+      .tickFormat(d3.format("~s"));
   
     yAxisGroup.call(yAxisCall);
     yAxisGroup.select(".domain").remove();
@@ -6041,16 +6289,16 @@ function plot_deforestation_area3(deforestation_area, {
       
     // data bars with dynamic color mapping
     g.selectAll(".data-bar")
-      .data(sortedData.filter(d => d.percent_forest_lost > 0))
+      .data(dataWithHectares.filter(d => d.deforested_this_year_ha > 0))
       .enter().append("rect")
       .attr("class", "data-bar")
       .attr("x", d => xScale(d.year))
       .attr("width", xScale.bandwidth())
-      .attr("y", d => yScale(d.percent_forest_lost))
-      .attr("height", d => innerHeight - yScale(d.percent_forest_lost))
-      .attr("fill", d => deforestationColorMap[d.year])
+      .attr("y", d => yScale(d.deforested_this_year_ha))
+      .attr("height", d => innerHeight - yScale(d.deforested_this_year_ha))
+      .attr("fill", barColor)
       .attr("fill-opacity", 1)
-      .attr("stroke", d => d3.color(deforestationColorMap[d.year]).darker(0.5))
+      .attr("stroke", d3.color(barColor).darker(0.5))
       .attr("stroke-width", 1)
       .style("cursor", "default")
       .on("mouseover", function(event, d) {
@@ -6071,7 +6319,7 @@ function plot_deforestation_area3(deforestation_area, {
           .style("z-index", "1000")
           .style("opacity", 0);
   
-        tooltip.html(`<div>Year: ${d.year}</div><div>Forest Lost: ${d.percent_forest_lost.toFixed(2)}%</div>`)
+        tooltip.html(`<div>Year: ${d.year}</div><div>Forest Lost: ${d.deforested_this_year_ha.toLocaleString('en-US', {maximumFractionDigits: 1})} ha</div>`)
           .style("left", (event.pageX - 60) + "px")
           .style("top", (event.pageY - 70) + "px")
           .transition()
@@ -6099,9 +6347,9 @@ function plot_deforestation_area3(deforestation_area, {
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${innerHeight})`);
     
-    const numYears = sortedData.length;
+    const numYears = dataWithHectares.length;
     const tickInterval = Math.max(1, Math.ceil(numYears / Math.floor(width / 50)));
-    const tickValues = sortedData
+    const tickValues = dataWithHectares
       .filter((d, i) => i % tickInterval === 0)
       .map(d => d.year);
       
@@ -6136,9 +6384,9 @@ function plot_deforestation_area3(deforestation_area, {
       .attr("fill", "currentColor")
       .attr("font-size", "18px") 
       .attr("font-family", "system-ui")
-      .text(`Annual Deforestation as Percentage of Original Forest, ${minYear}-${maxYear}`);
+      .text(`Annual Deforestation, ${minYear}-${maxYear}`);
       
-    // subtitle with dynamic year range
+    // subtitle
     const titleLocation = countryName ? `${cityName}, ${countryName}` : cityName;
     svg.append("text")
       .attr("x", 20)
@@ -6173,209 +6421,8 @@ function plot_deforestation_area3(deforestation_area, {
       
     return svg.node();
   }
-
-// function with d3.js that plots cumulative forest remaining over time to create deforestation_area2 chart
-function plot_deforestation_area2(deforestation_area, {
-  cityName = "City",
-  countryName = "",
-  width = plotWidth,
-  xLabel = "Year",
-  yLabel = "Percentage of Forest Remaining (%)",
-  color = "black"
-} = {}) {
-  
-  const height = width * 0.6;
-  const margin = {
-    top: 70,
-    right: Math.max(20, width * 0.02), 
-    bottom: Math.max(90, width * 0.1),
-    left: Math.max(80, width * 0.08)
-  };
-  const innerWidth = width - margin.left - margin.right;
-  const innerHeight = height - margin.top - margin.bottom;
-  
-  // year range
-  const minYear = d3.min(deforestation_area, d => d.year);
-  const maxYear = d3.max(deforestation_area, d => d.year);
-  
-  // scales
-  const xScale = d3.scaleLinear()
-    .domain(d3.extent(deforestation_area, d => d.year))
-    .range([0, innerWidth]);
-    
-  const yScale = d3.scaleLinear()
-    .domain([
-      Math.min(...deforestation_area.map(d => d.percent_forest_remaining)) - 0.1,
-      100
-    ])
-    .range([innerHeight, 0]);
-
-  // svg
-  const svg = d3.create("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .style("background", "white")
-    .style("font", "10px system-ui");
-
-  const g = svg.append("g")
-    .attr("transform", `translate(${margin.left},${margin.top})`);
-  
-  // y-axis with grid lines
-  const yTicks = Math.max(4, Math.min(10, Math.floor(width * 0.6) / 60));
-  const yAxisGroup = g.append("g").attr("class", "y-axis");
-  const yAxisCall = d3.axisLeft(yScale)
-    .ticks(yTicks)
-    .tickSizeOuter(0)
-    .tickSizeInner(-innerWidth)
-    .tickFormat(d3.format("~s"));
-
-  yAxisGroup.call(yAxisCall);
-  yAxisGroup.select(".domain").remove();
-  yAxisGroup.selectAll(".tick line")
-    .attr("stroke", "#f0f0f0")
-    .attr("stroke-width", 1);
-  yAxisGroup.selectAll(".tick text")
-    .attr("fill", "currentColor")
-    .attr("font-size", "10px")
-    .attr("font-family", "system-ui")
-    .attr("font-weight", "normal")
-    .attr("dx", "-0.3em");
-  
-  // x-axis
-  const xAxisGroup = g.append("g")
-    .attr("class", "x-axis")
-    .attr("transform", `translate(0,${innerHeight})`);
-    
-  xAxisGroup.call(d3.axisBottom(xScale)
-    .ticks(Math.max(5, Math.min(15, Math.floor(width / 80))))
-    .tickFormat(d3.format("d"))
-    .tickSizeOuter(0));
-  xAxisGroup.select(".domain")
-    .attr("stroke", "currentColor")
-    .attr("stroke-width", 1);
-
-  xAxisGroup.selectAll(".tick text")
-    .attr("fill", "currentColor")
-    .attr("font-size", "10px")
-    .attr("font-family", "system-ui")
-    .attr("font-weight", "normal")
-    .attr("dy", "1.5em");
-  
-  // line (with defined function to skip null values)
-  const line = d3.line()
-    .defined(d => d.percent_forest_remaining !== null)
-    .x(d => xScale(d.year))
-    .y(d => yScale(d.percent_forest_remaining));
-    
-  g.append("path")
-    .datum(deforestation_area)
-    .attr("fill", "none")
-    .attr("stroke", color)
-    .attr("stroke-width", Math.max(1.5, Math.min(3, width / 400)))
-    .attr("d", line);
-  
-  // dots (filter out null values)
-  g.selectAll(".dot")
-    .data(deforestation_area.filter(d => d.percent_forest_remaining !== null))
-    .enter().append("circle")
-    .attr("class", "dot")
-    .attr("cx", d => xScale(d.year))
-    .attr("cy", d => yScale(d.percent_forest_remaining))
-    .attr("r", Math.max(2, Math.min(3, width / 200)))
-    .attr("fill", color)
-    .style("cursor", "default")
-    .on("mouseover", function(event, d) {
-      d3.selectAll(".d3-tooltip").remove();
-
-      const tooltip = d3.select("body").append("div")
-        .attr("class", "d3-tooltip")
-        .style("position", "absolute")
-        .style("background", "white")
-        .style("color", "black")
-        .style("padding", "8px 12px")
-        .style("border", "1.8px solid #000000")
-        .style("font-family", "system-ui")
-        .style("font-size", "12px")
-        .style("font-weight", "normal")
-        .style("line-height", "1.4")
-        .style("box-shadow", "0 2px 8px rgba(0,0,0,0.15)")
-        .style("pointer-events", "none")
-        .style("z-index", "1000")
-        .style("opacity", 0);
-        
-      tooltip.html(`<div>Year: ${d.year}</div><div>${yLabel}: ${d.percent_forest_remaining.toFixed(2)}%</div>`)
-        .style("left", (event.pageX - 60) + "px")
-        .style("top", (event.pageY - 60) + "px")
-        .transition()
-        .duration(200)
-        .style("opacity", 1);
-    })
-    .on("mousemove", function(event) {
-      const tooltip = d3.select(".d3-tooltip");
-      if (!tooltip.empty()) {
-        tooltip
-          .style("left", (event.pageX - 60) + "px")
-          .style("top", (event.pageY - 60) + "px");
-      }
-    })
-    .on("mouseout", function() {
-      d3.selectAll(".d3-tooltip")
-        .transition()
-        .duration(200)
-        .style("opacity", 0)
-        .remove();
-    });
-  
-  // title
-  svg.append("text")
-    .attr("x", 20)
-    .attr("y", 25)
-    .attr("text-anchor", "start")
-    .attr("fill", "currentColor")
-    .attr("font-size", "18px") 
-    .attr("font-family", "system-ui")
-    .attr("font-weight", "normal")
-    .text(`Cumulative Forest Remaining Over Time, ${minYear}-${maxYear}`);
-    
-  // subtitle
-  svg.append("text")
-    .attr("x", 20)
-    .attr("y", 45)
-    .attr("text-anchor", "start")
-    .attr("fill", "currentColor")
-    .attr("font-size", "16px")
-    .attr("font-family", "system-ui")
-    .attr("font-style", "italic")
-    .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
-    
-  // y-axis label
-  svg.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 20)
-    .attr("x", -(margin.top + innerHeight/2))
-    .attr("text-anchor", "middle")
-    .attr("fill", "currentColor")
-    .attr("font-size", "11px")
-    .attr("font-family", "system-ui")
-    .attr("font-weight", "normal")
-    .text(yLabel);
-    
-  // x-axis label
-  svg.append("text")
-    .attr("x", margin.left + innerWidth/2)
-    .attr("y", height - 45)
-    .attr("text-anchor", "middle")
-    .attr("fill", "currentColor")
-    .attr("font-size", "11px")
-    .attr("font-family", "system-ui")
-    .attr("font-weight", "normal")
-    .text(xLabel);
-    
-  return svg.node();
-}
-
-// function with d3.js that plots deforestation_area data for the "annual deforestation as percentage of total deforestation" using styling for visual cohesion with deforestation map (i.e., City Scan, Climate Conditions, Forests & Deforestation, 2000-2020* (actually 2025, since data goes to 2023) map)
+ 
+ // function with d3.js that plots deforestation_area data for the "annual deforestation as percentage of total deforestation" using styling for visual cohesion with deforestation map (i.e., City Scan, Climate Conditions, Forests & Deforestation, 2000-2020* (actually 2025, since data goes to 2023) map)
 function plot_deforestation_area4(deforestation_area, {
     cityName = "City", 
     countryName = "",
@@ -6400,22 +6447,8 @@ function plot_deforestation_area4(deforestation_area, {
     const minYear = d3.min(sortedData, d => d.year);
     const maxYear = d3.max(sortedData, d => d.year);
     
-    // color scale (for visual cohesion with deforestation map),  where: light yellow (early); dark yellow (mid-early); orange (mid-recent); dark red (recent)
-      const colorScale = d3.scaleLinear()
-      .domain([
-        minYear, 
-        minYear + (maxYear - minYear) * 0.33,
-        minYear + (maxYear - minYear) * 0.67,
-        maxYear
-      ])
-      .range(["#f3f14d", "#f2cc69", "#eead70", "#e47673"])
-      .interpolate(d3.interpolateRgb);
-    
-    // create color map for all years in data
-    const deforestationColorMap = {};
-    sortedData.forEach(d => {
-      deforestationColorMap[d.year] = colorScale(d.year);
-    });
+    // single color for all bars
+    const barColor = "#e47673";
     
     const height = width * 0.6;
     const margin = {
@@ -6467,7 +6500,7 @@ function plot_deforestation_area4(deforestation_area, {
       .attr("font-size", "10px")
       .attr("font-family", "system-ui");
       
-    // data bars with dynamic color mapping
+    // data bars with single color
     g.selectAll(".data-bar")
       .data(dataWithPercentages.filter(d => d.percent_of_total_deforestation > 0))
       .enter().append("rect")
@@ -6476,9 +6509,9 @@ function plot_deforestation_area4(deforestation_area, {
       .attr("width", xScale.bandwidth())
       .attr("y", d => yScale(d.percent_of_total_deforestation))
       .attr("height", d => innerHeight - yScale(d.percent_of_total_deforestation))
-      .attr("fill", d => deforestationColorMap[d.year])
+      .attr("fill", barColor)
       .attr("fill-opacity", 1)
-      .attr("stroke", d => d3.color(deforestationColorMap[d.year]).darker(0.5))
+      .attr("stroke", d3.color(barColor).darker(0.5))
       .attr("stroke-width", 1)
       .style("cursor", "default")
       .on("mouseover", function(event, d) {
@@ -6501,7 +6534,7 @@ function plot_deforestation_area4(deforestation_area, {
   
         tooltip.html(`<div>Year: ${d.year}</div><div>Percent of Total Deforestation: ${d.percent_of_total_deforestation.toFixed(2)}%</div>`)
           .style("left", (event.pageX - 60) + "px")
-          .style("top", (event.pageY - 90) + "px") //70
+          .style("top", (event.pageY - 90) + "px")
           .transition()
           .duration(200)
           .style("opacity", 1);
@@ -6566,7 +6599,7 @@ function plot_deforestation_area4(deforestation_area, {
       .attr("font-family", "system-ui")
       .text(`Annual Deforestation as Percentage of Total Deforestation, ${minYear}-${maxYear}`);
       
-    // subtitle with dynamic year range
+    // subtitle
     const titleLocation = countryName ? `${cityName}, ${countryName}` : cityName;
     svg.append("text")
       .attr("x", 20)
@@ -6602,7 +6635,7 @@ function plot_deforestation_area4(deforestation_area, {
     return svg.node();
   }
 
-// function with d3.js that plots deforestation_area data in small-multiple form showing year-by-year forest compostion
+  // function with d3.js that plots deforestation_area data in small-multiple form showing year-by-year forest compostion
 function plot_deforestation_area5(deforestation_area, {
     cityName = "City",
     countryName = "",
@@ -7044,7 +7077,7 @@ function plot_deforestation_area6(deforestation_area, {
     
     return svg.node();
   }
-     
+
 // function with d3.js that plots flood events to create (scatter) flood event chart (i.e., Large flood events in xxxx)
 function plot_fe(fe, {
   cityName = "City",
@@ -7285,7 +7318,6 @@ function plot_fe(fe, {
 // function with d3.js that plots fu to create fu chart (i.e., built-up area exposed to river (fluvial) flooding chart, xxxx - xxxx)
 function plot_fu(fu, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   xLabel = "Year",
   yLabel = "Exposed Urban Built-up Area (sq km)",
@@ -7460,7 +7492,7 @@ function plot_fu(fu, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -7491,7 +7523,6 @@ function plot_fu(fu, {
 // function with d3.js that plots pu to create pu chart (i.e., built-up area exposed to rainwater (pluvial) flooding chart, xxxx - xxxx)
 function plot_pu(pu, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   xLabel = "Year",
   yLabel = "Exposed Urban Built-up Area (sq km)",
@@ -7666,7 +7697,7 @@ function plot_pu(pu, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -7697,7 +7728,6 @@ function plot_pu(pu, {
 // function with d3.js that plots cu to create cu chart (i.e., built-up area exposed to coastal flooding chart, xxxx - xxxx)
 function plot_cu(cu, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   xLabel = "Year",
   yLabel = "Exposed Urban Built-up Area (sq km)",
@@ -7872,7 +7902,7 @@ function plot_cu(cu, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -7902,7 +7932,6 @@ function plot_cu(cu, {
 // function with d3.js that plots comb to create comb chart (i.e., built-up area exposed to combined flooding chart, xxxx - xxxx)
 function plot_comb(comb, pu, fu, cu, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   xLabel = "Year",
   yLabel = "Exposed Urban Built-up Area (sq km)",
@@ -8130,7 +8159,7 @@ function plot_comb(comb, pu, fu, cu, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
   
   // legend
   const legendData = [
@@ -9431,7 +9460,6 @@ function plot_l_area(l_area, {
 // function with d3.js that plots earthquake events to create (scatter) earthquake event chart (i.e., Significant Earthquakes within 500 km of xxxx since 1900)
 function plot_ee(ee, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Year",
   xLabel = `Distance from ${cityName} (km)`
@@ -9598,7 +9626,7 @@ function plot_ee(ee, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
     
   // y-axis label
   svg.append("text")
@@ -9658,7 +9686,6 @@ function wrapText(text, maxWidth, font) {
 // function with d3.js that plots fwi to create fwi chart (i.e., fire weather index chart, January - December)
 function plot_fwi(fwi, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   xLabel = "Month",
   yLabel = "95th Percentile FWI",
@@ -9878,7 +9905,7 @@ function plot_fwi(fwi, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName}`);
+    .text(cityName);
   
   // caption (wrapped text)
   const captionText = "Data: NASA Global Fire Weather Database (GFWED) | Risk Classification: EFFIS/Copernicus Emergency Management Service | Note: Thresholds represent international standard; regional variation may apply";
@@ -9923,7 +9950,6 @@ function plot_fwi(fwi, {
 // function with d3.js that plots fwi danger level distribution to create fwi_d chart (i.e., fire weather index (FWI) danger level distribution [horizontal bar chart])
 function plot_fwi_d(fwi, {
   cityName = "City",
-  countryName = "",
   width = plotWidth,
   yLabel = "Danger Level",
   xLabel = "Weeks",
@@ -10074,7 +10100,7 @@ function plot_fwi_d(fwi, {
     .tickPadding(10));
   yAxisGroup.select(".domain").remove();
   
-  // replace text with wrapped text
+  // Replace text with wrapped text
   yAxisGroup.selectAll(".tick text").remove();
   yAxisGroup.selectAll(".tick")
     .append("foreignObject")
@@ -10128,7 +10154,7 @@ function plot_fwi_d(fwi, {
     .attr("font-family", "system-ui")
     .attr("font-style", "italic")
     .attr("font-weight", "normal")
-    .text(`${cityName}, ${countryName} (${fwi.length}-week period)`);
+    .text(`${cityName} (${fwi.length}-week period)`);
   
   // caption (wrapped text)
   const captionText = "Data: NASA Global Fire Weather Database (GFWED) | Risk Classification: EFFIS/Copernicus Emergency Management Service | Note: Thresholds represent international standard; regional variation may apply";
@@ -10174,7 +10200,6 @@ function plot_fwi_d(fwi, {
 // function that plots d (i.e., density) (Density, xxxx - xxxx) to create d chart
 function plot_d(pug, {
     cityName = "City",
-    countryName = "",
     width = plotWidth, // make width 95% of container/viewport
     yLabel = "Density (people / sq km)",
     xLabel = "Year",
@@ -10224,7 +10249,6 @@ function plot_d(pug, {
 // function that plots pug (i.e., population urban growth) ratio to create pug ratio chart (i.e., Population-Urban Growth Ratio, xxxx - xxxx)
 function plot_pug(pug, {
     cityName = "City",
-    countryName = "",
     width = plotWidth, // make width 95% of container/viewport
     yLabel = "Year",
     color = "black"
@@ -10326,49 +10350,49 @@ function plot_pug(pug, {
 ### POPULATION AND DEMOGRAPHIC TRENDS
 ```{ojs}
 // use plot_pga function to create the pga chart
-chart_pga = plot_pga(pg, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_pga = plot_pga(pg, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_pgp function to create the pgp chart
-chart_pgp = plot_pgp(pg, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_pgp = plot_pgp(pg, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_pas function to create the pas chart
-chart_pas = plot_pas(pas, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_pas = plot_pas(pas, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_pas_pyramid function to create the pas pyramid chart
-chart_pas_pyramid = plot_pas_pyramid(pas, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_pas_pyramid = plot_pas_pyramid(pas, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_age function to create the age (using pas data) treemap chart
-chart_age = plot_age(pas, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_age = plot_age(pas, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_dependency function to create the dependency bubble chart (using pas data)
-chart_dependency = plot_dependency(pas, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_dependency = plot_dependency(pas, {cityName: "Nouakchott, Mauritania"})
 ```
 
 ### ECONOMIC ACTIVITY
 ```{ojs}
 // use plot_rwi_area function to create the rwi (i.e., relative wealth index, rwi) chart
-chart_rwi_area = plot_rwi_area(rwi_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_rwi_area = plot_rwi_area(rwi_area, {cityName: "Nouakchott, Mauritania"})
 ```
 
 
 ### BUILT FORM
 ```{ojs}
 // use plot_uba_area function to create the uba_area (i.e., percentage area of AOI with different years of urban built-up area expansion, "Before 1985", "1986-1995", "1996-2005", and "2006-2015") chart
-chart_uba_area = plot_uba_area(uba_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_uba_area = plot_uba_area(uba_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_ubaa function to create the ubaa chart
-chart_ubaa = plot_ubaa(uba, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_ubaa = plot_ubaa(uba, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_ubap function to create the ubap chart
-chart_ubap = plot_ubap(uba, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_ubap = plot_ubap(uba, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_lc to make the lc chart
-chart_lc = plot_lc(lc, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_lc = plot_lc(lc, {cityName: "Nouakchott, Mauritania"})
 // with custom dimensions:
 // landCoverTreemap(lc, {width: 600, height: 400, cityName: "City Name"})
 
 // use plot_uddm function to create the uddm small multiples charts
-chart_uddm = plot_uddm(pg, uba, pug, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_uddm = plot_uddm(pg, uba, pug, {cityName: "Nouakchott, Mauritania"})
 ```
 
 ### CLIMATE CONDITIONS
@@ -10386,72 +10410,71 @@ plot_pv_d(pv, {cityName: "Nouakchott, Mauritania"})
 chart_pv = plot_pv(pv, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_aq function to create the aq (i.e., air quality) chart
-chart_aq = plot_aq(aq_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_aq = plot_aq(aq_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_summer_area function to create the summer surface temperature area chart
-chart_summer_area = plot_summer_area(summer_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_summer_area = plot_summer_area(summer_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_ndvi_area function to create the ndvi (i.e., green space, ndvi) chart
-chart_ndvi_area = plot_ndvi_area(ndvi_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_ndvi_area = plot_ndvi_area(ndvi_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_deforestation_area1 function to create the deforestation_area1 (line) chart
-chart_deforestation_area1 = plot_deforestation_area1(deforestation_area, {cityName: "Nouakchott", countryName: "Mauritania"})
-
-// use plot_deforestation_area3 function to create the deforestation_area3 (bar) chart (i.e., annual deforestation percentage of total original forest)
-chart_deforestation_area3 = plot_deforestation_area3(deforestation_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+// chart_deforestation_area1 = plot_deforestation_area1(deforestation_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_deforestation_area2 function to create the deforestation_area2 (line) chart
-chart_deforestation_area2 = plot_deforestation_area2(deforestation_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+// chart_deforestation_area2 = plot_deforestation_area2(deforestation_area, {cityName: "Nouakchott, Mauritania"})
 
-// use plot_deforestation_area4 function to create the deforestation_area4 (bar) chart (i.e., annual deforestation percentage of total deforestation)
-chart_deforestation_area4 = plot_deforestation_area4(deforestation_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+// use plot_deforestation_area3 function to create the deforestation_area3 (bar) chart (i.e., annual deforestation in hectares)
+// chart_deforestation_area3 = plot_deforestation_area3(deforestation_area, {cityName: "Nouakchott, Mauritania"})
 
-// use plot_deforestation_area6 to create the chart_deforestation_area6 small multiples bubble chart (progression of deforestation over time)
-chart_deforestation_area6 = plot_deforestation_area6(deforestation_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+// use plot_deforestation_area4 function to create the deforestation_area4 (bar) chart (i.e., annual deforestation as a percentage of total deforestation)
+// chart_deforestation_area4 = plot_deforestation_area4(deforestation_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_deforestation_area5 to create the chart_deforestation_area5 small multiples bubble chart (year-by-by forest composistion)
-chart_deforestation_area5 = plot_deforestation_area5(deforestation_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+// chart_deforestation_area5 = plot_deforestation_area5(deforestation_area, {cityName: "Nouakchott, Mauritania"})
+
+// use plot_deforestation_area6 to create the chart_deforestation_area6 small multiples bubble chart (progression of deforestation over time)
+// chart_deforestation_area6 = plot_deforestation_area6(deforestation_area, {cityName: "Nouakchott, Mauritania"})
 ```
 
 ### RISK IDENTIFCATION
 ```{ojs}
 // use plot_fe function to create the fe chart
-chart_fe = plot_fe(fe, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_fe = plot_fe(fe, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_fu function to create the fu chart
-chart_fu = plot_fu(fu, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_fu = plot_fu(fu, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_pu function to create the pu chart
-chart_pu = plot_pu(pu, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_pu = plot_pu(pu, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_cu function to create the cu chart
-chart_cu = plot_cu(cu, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_cu = plot_cu(cu, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_comb function to create the comb chart
-chart_comb = plot_comb(comb, pu, fu, cu, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_comb = plot_comb(comb, pu, fu, cu, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_e function to create the e (i.e., elevation) chart
-chart_e = plot_e(e, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_e = plot_e(e, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_s function to create the s (i.e., slope) chart
-chart_s = plot_s(s, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_s = plot_s(s, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_ls_area function to create the ls_area chart (i.e., Percentage of Area with different landslide susceptibility levels, "Very low" (1); "Low" (2); "Medium" (3); "High" (4); and "Very high" (5))
-chart_ls_area= plot_ls_area(ls_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_ls_area= plot_ls_area(ls_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_l_area function to create the l_area chart (i.e., Percentage of Area with different liquefaction susceptibility levels, "Very low" (1); "Low" (2); "Medium" (3); "High" (4); and "Very high" (5))
-chart_l_area= plot_l_area(l_area, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_l_area= plot_l_area(l_area, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_ee function to create the ee chart
-chart_ee = plot_ee(ee, {cityName: "Nouakchott", countryName: "Mauritania"})
+// chart_ee = plot_ee(ee, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_fwi function to create the fwi chart
-chart_fwi = plot_fwi(fwi, {cityName: "Nouakchott", countryName: "Mauritania"})
+chart_fwi = plot_fwi(fwi, {cityName: "Nouakchott, Mauritania"})
 
 // use plot_fwi_d function to create the fwi_d chart
-plot_fwi_d(fwi, {cityName: "Nouakchott", countryName: "Mauritania"})
+plot_fwi_d(fwi, {cityName: "Nouakchott, Mauritania"})
 ```
-
 
 
 
