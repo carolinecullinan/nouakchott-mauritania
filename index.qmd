@@ -10345,6 +10345,222 @@ function plot_pug(pug, {
   });
   }
 ```
+### Executive Summary
+```{ojs}
+//| echo: false
+{
+  // auto-generate insights from data (as of 17dic2025, this is NOT working - Nouakchott information is hardcoded for the sake of delivery, but the plan is to scale this for automatic insight generation)
+  const popInsights = {
+    latestPop: pg[pg.length - 1].population.toLocaleString('en-US', {maximumFractionDigits: 0}),
+    latestYear: pg[pg.length - 1].yearName,
+    earliestYear: pg[0].yearName,
+    totalGrowth: ((pg[pg.length - 1].population - pg[0].population) / pg[0].population * 100).toFixed(1),
+    avgGrowth: (pg.slice(1).reduce((sum, d) => sum + d.populationGrowthPercentage, 0) / (pg.length - 1)).toFixed(2)
+  };
+
+  const builtUpInsights = {
+    earliestArea: uba[0].builtUpArea,
+    latestArea: uba[uba.length - 1].builtUpArea,
+    earliestYear: uba[0].year,
+    latestYear: uba[uba.length - 1].year,
+    growth: (((uba[uba.length - 1].builtUpArea - uba[0].builtUpArea) / uba[0].builtUpArea) * 100).toFixed(2)
+  };
+
+  const pvInsights = {
+    avgPV: (pv.reduce((sum, d) => sum + d.mean, 0) / 12).toFixed(2),
+    maxMonth: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][pv.reduce((max, d, i) => d.mean > pv[max].mean ? i : max, 0)],
+    minMonth: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][pv.reduce((min, d, i) => d.mean < pv[min].mean ? i : min, 0)]
+  };
+
+  const riskInsights = {
+    totalEvents: fe.length,
+    totalDisplaced: fe.reduce((sum, d) => sum + d.DISPLACED, 0).toLocaleString(),
+    veryLarge: fe.filter(d => d.severity === "Very large event").length
+  };
+  
+  const landCoverInsights = (() => {
+    const lcTypes = lc.map(d => ({
+      type: d.type,
+      area: d.area
+    })).sort((a, b) => b.area - a.area);
+    
+    return {
+      top1: lcTypes[0],
+      top2: lcTypes[1],
+      top3: lcTypes[2]
+    };
+  })();
+  
+  return html`<div style="max-width: 1400px; margin: 0 auto; font-family: system-ui;">
+    
+    <h1 style="margin: 0 0 10px 0; font-size: 32px; font-weight: 700;">
+      1 Executive Summary
+    </h1>
+
+    <!-- SECTION 2: SETTING THE CONTEXT -->
+    <div style="display: grid; grid-template-columns: 45% 55%; gap: 30px; align-items: start; margin: 40px 0; border-top: 4px solid #6ccff6; padding-top: 20px;">
+      
+      <div style="font-size: 13px; line-height: 1.5; color: #333;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #6ccff6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">2</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Setting the Context</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Nouakchott is located in southwestern Mauritania, along the Atlantic coast at the western edge of the Sahara Desert and serves as the country's capital and largest city. This analysis is for the city and its surrounding areas.
+        </p>
+           
+      </div>
+
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <img src="${await FileAttachment("Nouakchott_in_Mauritania.svg").url()}" 
+             style="max-width: 50%; height: auto;" 
+             alt="Map of Nouakchott, Mauritania">
+      </div>
+      
+    </div>
+    
+    <!-- SECTION 3: POPULATION AND DEMOGRAPHIC TRENDS -->
+    <div style="display: grid; grid-template-columns: 45% 55%; gap: 30px; align-items: start; margin: 40px 0; border-top: 4px solid #659a76; padding-top: 20px;">
+      
+      <div style="font-size: 13px; line-height: 1.5; color: #333;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #659a76; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">3</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Population and Demographic Trends</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Nouakchott's population has grown by <strong>${popInsights.totalGrowth}%</strong> from ${popInsights.earliestYear} to ${popInsights.latestYear} with an average growth rate of <strong>${popInsights.avgGrowth}%</strong> annually. In ${popInsights.latestYear}, the area had a population of <strong>${popInsights.latestPop}</strong> people. The population mainly concentrates around the main urban centralities, including Sebkha, Arafat, and Dat Naim.
+        </p>
+           
+      </div>
+
+      <div>
+        ${plot_pgp(pg, {width: 600, cityName: "Nouakchott"})}
+      </div>
+      
+    </div>
+
+    <!-- SECTION 4: ECONOMIC ACTIVITY -->
+    <div style="display: grid; grid-template-columns: 45% 55%; gap: 30px; align-items: start; margin: 40px 0; border-top: 4px solid #f5a5c6; padding-top: 20px;">
+     
+      <div style="font-size: 13px; line-height: 1.5; color: #333;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #f5a5c6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">4</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Economic Activity</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Economic activity in Nouakchott is driven by commerce, public administration, and services, including the financial sector, alongside small-scale industry. Port-related activities anchored by the Port of Nouakchott (Port de l'Amitié) play a central role in trade and logistics, while fisheries and fisheries-related activities constitute a critical pillar of employment and local economic activity.
+        </p>
+           
+      </div>
+
+      <div>
+        ${plot_rwi_area(rwi_area, {width: 600, cityName: "Nouakchott"})}
+      </div>
+      
+    </div>
+
+    <!-- SECTION 5: BUILT FORM -->
+    <div style="display: grid; grid-template-columns: 45% 55%; gap: 30px; align-items: start; margin: 40px 0; border-top: 4px solid #fcf8c8; padding-top: 20px;">
+      
+      <div style="font-size: 13px; line-height: 1.5; color: #333;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #fcf8c8; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">5</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Built Form</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Since 1985, Nouakchott's built-up area has increased by <strong>323.27%</strong>, growing from <strong>28.6 km²</strong> in 1985 to <strong>121.05 km²</strong> in 2015. Most recent expansion has occurred mainly toward the east and southeast, as well as north of Ksar and Tevragh-Zeina and west of Sebkha. Most of the land outside the built-up area is <strong>bare / spare vegetation</strong>, followed by <strong>permanent water bodies</strong>, and <strong>shrubland</strong>. Schools and health facilities are fairly well distributed throughout the area.
+        </p>
+           
+      </div>
+
+      <div>
+        ${plot_ubaa(uba, {width: 600, cityName: "Nouakchott"})}
+      </div>
+      
+    </div>
+    
+    <!-- SECTION 6: CLIMATE CONDITIONS -->
+    <div style="margin: 40px 0; border-top: 4px solid #aaff00; padding-top: 20px;">
+      
+      <div style="font-size: 13px; line-height: 1.5; color: #333; margin-bottom: 20px;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #aaff00; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">6</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Climate Conditions</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Solar energy potential is <strong>excellent</strong> in Nouakchott. Air quality is <strong>poor</strong> across the area, and the concentration of particulate matter <strong>exceeds</strong> WHO safety standards. Summer surface temperatures display a clear coastal-to-inland gradient, with cooler conditions along the coast and progressively higher temperatures inland and toward the east.
+        </p>
+      
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+        <div style="overflow: hidden;">${plot_pv_alt(pv, {width: 420, cityName: "Nouakchott"})}</div>
+        <div style="overflow: hidden;">${plot_aq(aq_area, {width: 420, cityName: "Nouakchott"})}</div>
+        <div style="overflow: hidden;">${plot_summer_area(summer_area, {width: 420, cityName: "Nouakchott"})}</div>
+      </div>
+      
+    </div>
+    
+    <!-- SECTION 7: RISK IDENTIFICATION -->
+    <div style="margin: 40px 0; border-top: 4px solid #eb8b25; padding-top: 20px;">
+      
+      <div style="font-size: 13px; line-height: 1.5; color: #333; margin-bottom: 20px;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #eb8b25; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; color: white;">7</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Risk Identification</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Floods pose some risk in Nouakchott. Since 1995, there has been <strong>${riskInsights.totalEvents} large flood event${riskInsights.totalEvents > 1 ? 's' : ''}</strong>, displacing a total of <strong>${riskInsights.totalDisplaced}</strong> people. As of 2015, <strong>32.68%</strong> of the built-up area was exposed to <strong>combined</strong> riverine, surface water, and coastal <strong>flooding</strong>. There is <strong>very low landslide susceptibility</strong> throughout, while <strong>liquefaction</strong> in the area is <strong>medium to high</strong>. <strong>Burnability</strong> is limited in extent but spatially concentrated along the urban periphery.
+        </p>
+            
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+        <div style="overflow: hidden;">${plot_fe(fe, {width: 420, cityName: "Nouakchott"})}</div>
+        <div style="overflow: hidden;">${plot_ls_area(ls_area, {width: 420, cityName: "Nouakchott"})}</div>
+        <div style="overflow: hidden;">${plot_l_area(l_area, {width: 420, cityName: "Nouakchott"})}</div>
+      </div>
+      
+    </div>
+
+    <!-- SECTION 8: LOCAL INSTITUTIONS AND PLANNING -->
+    <div style="display: grid; grid-template-columns: 45% 55%; gap: 30px; align-items: start; margin: 40px 0; border-top: 4px solid #af5881; padding-top: 20px;">
+      
+      <div style="font-size: 13px; line-height: 1.5; color: #333;">
+        
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 40px; height: 40px; background: #af5881; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px;">8</div>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Local Institutions and Planning</h3>
+        </div>
+        
+        <p style="margin: 12px 0; color: #555; line-height: 1.6;">
+          Mauritania is a unitary semi-presidential system, with national government functions concentrated in Nouakchott. Administrative authority is shared across regions (wilayas), departments (moughataas), and communes, with communes responsible for local service delivery and communal affairs. Since the late 1970s, and reinforced through decentralization reforms since the 1990s, local governments have gained greater roles in planning and development, though capacity constraints remain.
+        </p>
+        
+      </div>
+
+      <div>
+        
+      </div>
+      
+    </div>
+    
+  </div>`;
+}
+```
+
 #### Charts
 
 ### POPULATION AND DEMOGRAPHIC TRENDS
