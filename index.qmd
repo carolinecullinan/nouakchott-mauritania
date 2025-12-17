@@ -10414,7 +10414,7 @@ function plot_pug(pug, {
       </div>
 
       <div style="display: flex; justify-content: center; align-items: center;">
-        <img src="${await FileAttachment("Nouakchott_in_Mauritania.svg").url()}" 
+        <img src="Nouakchott_in_Mauritania.svg" 
              style="max-width: 50%; height: auto;" 
              alt="Map of Nouakchott, Mauritania">
       </div>
